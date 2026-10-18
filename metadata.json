@@ -1,0 +1,7 @@
+{
+  "uuid": "gnome-macos-experience@local",
+  "name": "GNOME macOS Experience",
+  "description": "Modular GNOME Shell behavior tweaks; does not configure shortcuts or remap keys.",
+  "shell-version": ["50"],
+  "version": 1
+}
