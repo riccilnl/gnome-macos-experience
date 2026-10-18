@@ -1,73 +1,66 @@
-# GNOME macOS Experience — v0.1.0
+# GNOME macOS Experience
 
-A **self-contained GNOME Shell 50 extension**. Install it on a fresh GNOME
-desktop and enable it; it requires **no FedoraAHK, XIME, other extension,
-system service, custom shortcut, or bundled script**.
+A lightweight GNOME Shell extension that makes input-source switching immediate and starts the desktop without opening the Activities overview.
 
-This extension changes only two GNOME Shell interactions:
+## Features
 
-1. **Direct input source cycling**: the stock GNOME
-   switch-input-source / switch-input-source-backward actions keep
-   their existing key assignments, but switch immediately and show no
-   input source popup. The extension never reads or writes the shortcut
-   values themselves. Fresh GNOME installs can use their default shortcut.
-2. **No login Activities overview**: after desktop startup completes,
-   return to the normal desktop. Activities remains available thereafter.
+- **Instant input-source switching.** Uses GNOME's existing *Switch to next/previous input source* shortcuts, but switches directly without showing the selection popup.
+- **Clean startup.** Skips the Activities overview when the desktop session starts. Activities remains available whenever you open it.
 
-## Install on a fresh GNOME 50 desktop
+The extension leaves your input sources and shortcut assignments unchanged.
 
-1. Obtain gnome-macos-experience@local.shell-extension.zip.
-2. Run: gnome-extensions install ./gnome-macos-experience@local.shell-extension.zip
-3. Log out and back in if GNOME Wayland has not yet discovered the new UUID.
-4. Run: gnome-extensions enable gnome-macos-experience@local
-   if not already enabled. Log in once more to verify skipping startup overview.
+## Compatibility
 
-No desktop input-source configuration or shortcut customization is part of
-installation. This extension does not **create** extra input sources:
-GNOME must already have the input sources the user wants to cycle through.
+GNOME Shell **50**. Input-source cycling works with the sources already configured in GNOME Settings.
 
-## Architecture
+The extension uses GNOME Shell internals that may change between major GNOME releases. Support for other versions is not yet verified.
 
-extension.js is only lifecycle orchestration; the modules are:
-- input-sources.js: bypass popup, preserve configured shortcuts,
-  restore stock handlers on disable.
-- startup-overview.js: dismiss overview on startup-complete,
-  disconnect signal on disable.
+## Installation
 
-FedoraAHK separately handles **any physical key remapping**. XIME/Rime,
-Fcitx5, and/or GNOME IBus independently handle composition. This extension
-does not require or know about any such program.
+1. Download the [extension ZIP](dist/gnome-macos-experience%40local.shell-extension.zip).
+2. Install it:
 
-## Existing machine migration
+   ```bash
+   gnome-extensions install ./gnome-macos-experience@local.shell-extension.zip
+   ```
 
-Do **not** enable this extension simultaneously with Quick Lang Switch:
-both register the same GNOME Shell input-source action. Keep existing
-Quick Lang Switch files as a rollback option. Disable the old extension
-and enable this one in a single atomic GNOME enabled-extensions list update,
-then log out/in so Wayland loads the new UUID.
+3. If it doesn't appear in the Extensions app, log out and log back in.
+4. Enable **GNOME macOS Experience** in the Extensions app, or run:
 
-## Development and verification
+   ```bash
+   gnome-extensions enable gnome-macos-experience@local
+   ```
 
-    python3 -B tests/test_contract.py -v
-    node --check extension.js
-    node --check input-sources.js
-    node --check startup-overview.js
-    node --experimental-vm-modules --no-warnings tests/mock-shell.mjs
+5. Log out and back in to verify the startup behavior.
 
-The package contains JS, metadata and license notices only; runtime is
-GNOME Shell itself. The GNOME Shell private input-source APIs can change
-with a future major version; do not claim untested GNOME versions.
+To remove the extension:
 
-## Attribution and license
+```bash
+gnome-extensions uninstall gnome-macos-experience@local
+```
 
-- Quick Lang Switch, ankostis; https://github.com/ankostis/gnome-shell-quick-lang-switch
-  — original AGPL-3.0 codebase; this project's keybinding algorithm adapted
-  from v17. See LICENSE-QUICK-LANG-SWITCH.
-- No overview at start-up, fthx; https://github.com/fthx/no-overview
-  — original GPL-3.0 codebase; startup signal logic adapted. See
-  LICENSE-NO-OVERVIEW.
+## Development
 
-Source notices are retained; this combined project is distributed under the
-GNU Affero General Public License v3 or later (see LICENSE), with the
-original No Overview GPLv3 code combined under GPLv3 section 13. Keep
-the full upstream license texts and attribution when redistributing.
+The code is split into three files:
+
+- `extension.js` — extension lifecycle.
+- `input-sources.js` — direct input-source switching.
+- `startup-overview.js` — startup overview behavior.
+
+Run the checks:
+
+```bash
+python3 -B -m unittest discover -s tests -p 'test_*.py' -q
+node --check extension.js
+node --check input-sources.js
+node --check startup-overview.js
+node --experimental-vm-modules --no-warnings tests/mock-shell.mjs
+```
+
+Rebuild the installation ZIP with `python3 scripts/build-package.py`.
+
+## Credits and license
+
+This project adapts code from [Quick Lang Switch](https://github.com/ankostis/gnome-shell-quick-lang-switch) and [No overview at start-up](https://github.com/fthx/no-overview). The original authors and license notices are preserved.
+
+Distributed under the **GNU Affero General Public License v3 or later**. See [LICENSE](LICENSE), [LICENSE-QUICK-LANG-SWITCH](LICENSE-QUICK-LANG-SWITCH), and [LICENSE-NO-OVERVIEW](LICENSE-NO-OVERVIEW).
